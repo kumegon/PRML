@@ -24,7 +24,7 @@ def f(x,w,phys):
   return [phy(x) for phy in phys] @ w
 
 def y(x):
-  return 3*x*(x-5)*(x+10)
+  return 3*x + 5
 
 def estimate_w(design_matrix, ts, regular):
   return np.linalg.solve(regular * np.identity(M) + design_matrix.T @ design_matrix, design_matrix.T @ ts)
@@ -84,4 +84,5 @@ axL.plot(range(1,CNT),evis, label="evidence")
 
 axR.plot(xs,ys, label="real",c="blue")
 axR.plot(xs,ys_,label="estimate",c="red")
+pyplot.legend()
 pyplot.show()

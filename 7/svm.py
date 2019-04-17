@@ -38,7 +38,7 @@ class SVM:
     self.kernel = kernel
     self.a = [0 for i in range(CLASS*N)]
     self.b = 0
-    self.C = 1
+    self.C = 1e0
     self.sv_index = [i for i in range(CLASS*N)]
     self.eps = eps
     self.cnt = 0
@@ -52,7 +52,7 @@ class SVM:
 
   def k(self, x, y):
     if(self.kernel == "gaussian"):
-      gamma = 0.04
+      gamma = 0.01
       return np.exp(gamma * ((x-y).transpose() @ (x-y))/ (-2))
     elif(self.kernel == "linear"):
       return x.transpose() @ y
@@ -84,14 +84,6 @@ class SVM:
       check &= self.is_KKT(i)
     return check
 
-  def select_var(self):
-    for i in range(CLASS*N):
-      if(self.a[i] > 0 and self.a[i] < self.C):
-        return i
-    for i in range(CLASS*N):
-      if(not self.is_KKT(i)):
-        return i
-    return -1
 
 
   def SMO(self):
@@ -113,6 +105,7 @@ class SVM:
         examineAll = 0
       elif(numChanged == 0):
         examineAll = 1
+      self.support_vector()
 
 
   def examineExample(self, i2):
@@ -183,7 +176,6 @@ class SVM:
   def support_vector(self):
     self.sv_index = []
     for i in range(CLASS*N):
-      print(self.a[i])
       if(self.a[i] > 0):# and self.a[i] < self.C):
         self.sv_index.append(i)
 
@@ -224,13 +216,13 @@ class SVM:
 phys = []
 for i in  range(M):
   phys.append((lambda i: lambda x:pow(x[0],i) + pow(x[1],i))(i))
-mean_1 = [5,3]
+mean_1 = [11,6]
 mean_2 = [-2,-5]
-cov_1 = [[10,4], [4, 10]]
-cov_2 = [[5,4],[4,4]]
+cov_1 = [[100,4], [4, 4]]
+cov_2 = [[9,2],[2,16]]
 
-mean_3 = [-10,-10]
-cov_3 = [[4,0],[0,4]]
+mean_3 = [-3,7]
+cov_3 = [[9,0],[0,9]]
 
 cls_1 = []
 cls_2 = []
@@ -242,6 +234,7 @@ X = gen_X(cls_1,cls_2)
 T = gen_T()
 
 svm = SVM(X,T,"gaussian",loop_max=1e2)
+#svm = SVM(X,T,"linear",loop_max=1e3)
 
 xs = np.linspace(-RANGE,RANGE,200)
 #ys = [svm.decision_bound(x) for x in xs]
@@ -254,7 +247,7 @@ Z = np.zeros((200,200))
 for i in range(200):
   for j in range(200):
     q = np.array([Xs[i][j],Ys[i][j]])
-    Z[j][i] += svm.y(q)
+    Z[i][j] += svm.y(q)
 
 pyplot.contour(Xs,Ys,Z,levels=[-1,0,1],colors='m')
 

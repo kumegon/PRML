@@ -2,24 +2,27 @@ import numpy as np
 from matplotlib import pyplot
 import math
 
-N = 100
-
+N = 30
+CLASS = 3
 def gen_X(ls_1,ls_2):
-  X = np.zeros((2*N,3))
+  X = np.zeros((CLASS*N,3))
   for i in range(N):
     X[i][1] = ls_1[i][0]
     X[i][2] = ls_1[i][1]
     X[i+N][1] = ls_2[i][0]
     X[i+N][2] = ls_2[i][1]
+    X[i+2*N][1] = ls_2[i+N][0]
+    X[i+2*N][2] = ls_2[i+N][1]
     X[i][0] = 1
     X[i+N][0] = 1
   return X
 
 def gen_T():
-  T = np.zeros((2*N,1))
+  T = np.zeros((CLASS*N,1))
   for i in range(N):
     T[i][0] = 1
     T[i+N] = 0
+    T[i+2*N] = 0
   return T
 
 def estimate(X,T):
@@ -51,16 +54,20 @@ def f2(x,m,w):
   y = -(w[0][0]*x-np.dot(w.transpose(),m))/w[1][0]
   return y.item((0,0))
 
-mean_1 = [1,1]
-mean_2 = [30,-20]
-cov_1 = [[100,49], [49, 64]]
-cov_2 = [[64,49],[49,400]]
+mean_1 = [11,6]
+mean_2 = [-2,-5]
+cov_1 = [[100,4], [4, 4]]
+cov_2 = [[9,2],[2,16]]
+
+mean_3 = [-3,7]
+cov_3 = [[9,0],[0,9]]
 
 cls_1 = []
 cls_2 = []
-
+np.random.seed(103)
 cls_1.extend(np.random.multivariate_normal(mean_1,cov_1,N))
 cls_2.extend(np.random.multivariate_normal(mean_2,cov_2,N))
+cls_2.extend(np.random.multivariate_normal(mean_3,cov_3,N))
 
 
 # Least square
@@ -68,7 +75,7 @@ X = gen_X(cls_1,cls_2)
 T = gen_T()
 W = estimate(X,T)
 
-x = np.linspace(-100,100,1000)
+x = np.linspace(-20,20,200)
 y1 = [estimate_y(W,x) for x in x]
 
 
